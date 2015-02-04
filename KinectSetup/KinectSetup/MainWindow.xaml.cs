@@ -326,6 +326,7 @@ namespace KinectSetup
                             {
                                 bw.Write(valor);
                             }
+                            bw.Write("\n"); 
                         }
                     }
                 }
@@ -344,6 +345,7 @@ namespace KinectSetup
                             {
                                 bw.Write(valor);
                             }
+                            bw.Write("\n"); 
                         }
                     }
                 }

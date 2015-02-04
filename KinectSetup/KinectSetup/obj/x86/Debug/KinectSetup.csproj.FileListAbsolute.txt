@@ -21,3 +21,4 @@ C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\bin\Debug\Em
 C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\bin\Debug\Emgu.CV.UI.xml
 C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\bin\Debug\Emgu.Util.xml
 C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup_Content.g.cs
+C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.csprojResolveAssemblyReference.cache
