@@ -28,12 +28,15 @@ namespace Deteccion
     { 
         //::::::::::::::Variables::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         //private string directorio = @;
-        private string archivoColor = @"C:\Users\America\Documents\VideosKinect\02032015123309.avi";
-        private string archivoDepth = @"C:\Users\America\Documents\VideosKinect\02032015123309.file";
+        private string archivoColor = @"C:\Users\America\Documents\VideosKinect\02032015123301.avi";
+        private string archivoColor2 = @"C:\Users\America\Documents\VideosKinect\02032015123303.avi";
+        private string archivoDepth = @"C:\Users\America\Documents\VideosKinect\02032015123302.file";
+        private string archivoDepth2 = @"C:\Users\America\Documents\VideosKinect\02032015123304.file";
         List<List<short>> DistanciaK1 = new List<List<short>>();
-        List<Image<Bgr, Byte>> FramesKinect1 = new List<Image<Bgr, byte>>(); 
-        //short[] aDistancia; 
-       
+        List<List<short>> DistanciaK2 = new List<List<short>>(); 
+        List<Image<Bgr, Byte>> FramesKinect1 = new List<Image<Bgr, Byte>>();
+        List<Image<Bgr, Byte>> FramesKinect2 = new List<Image<Bgr, Byte>>(); 
+
         //:::::::::::::fin variables::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -41,17 +44,26 @@ namespace Deteccion
         public MainWindow()
         {
             InitializeComponent();
+
+            DistanciaK1 = LeerDepth(archivoDepth);
+            DistanciaK2 = LeerDepth(archivoDepth2);
+
+            FramesKinect1 = GetFrames(archivoColor);
+            FramesKinect2 = GetFrames(archivoColor2); 
+            //GetFrames(); 
         } //Termina constructor 
 
 
         //:::::::::::::Leer y guardar los adtos de los archivos::::::::::::::::::::::::::::::::::::::: 
 
 
-        private void LeerDepth()
+        private List<List<short>> LeerDepth(string archivo)
         {
-            short valor; 
+            short valor;
+            List<List<short>> DistanciaK = new List<List<short>>(); 
 
-            using (FileStream file = new FileStream(archivoDepth,FileMode.Open,FileAccess.Read))
+
+            using (FileStream file = new FileStream(archivo,FileMode.Open,FileAccess.Read))
             {
                 using (BinaryReader br = new BinaryReader(file))
                 { 
@@ -68,7 +80,7 @@ namespace Deteccion
                             }
                             else
                             {
-                                DistanciaK1.Add(renglonLista); 
+                                DistanciaK.Add(renglonLista); 
                             }
                             try
                             {
@@ -79,33 +91,36 @@ namespace Deteccion
                                 break; 
                             }
                         }
-                        
-                    }
-                     
-                } //end BinaryReader
-            } //end FileStream
+                    }   
+                } 
+            } 
+
+            return DistanciaK; 
         } //Termina LeerDepth 
 
 
-        private void GetFrames()
+        private List<Image<Bgr,Byte>> GetFrames(string archivo)
         {
             bool leevideo = true;
             Image<Bgr,Byte> frame; 
-            Capture video = new Capture(archivoColor);
+            Capture video = new Capture(archivo);
+            List<Image<Bgr, Byte>> allFrames = new List<Image<Bgr, Byte>>();
 
             while (leevideo)
             {
                 frame = video.QueryFrame();
                 if (frame != null)
                 {
-                    FramesKinect1.Add(frame); 
+                    allFrames.Add(frame); 
                 }
                 else
                 {
                     leevideo = false; 
                 }
-            }           
-        }
+            }
+
+            return allFrames;  
+        } //termina GetFrames() 
 
 
     } //termina class
