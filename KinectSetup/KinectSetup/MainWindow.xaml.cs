@@ -48,6 +48,8 @@ namespace KinectSetup
         Image<Bgr, Byte> myImagen;
         List<Image<Bgr, Byte>> videoColor1 = new List<Image<Bgr, Byte>>();
         List<Image<Bgr, Byte>> videoColor2 = new List<Image<Bgr, Byte>>();
+        List<byte[]> listaBytes1 = new List<byte[]>();
+        List<byte[]> listaBytes2 = new List<byte[]>(); 
         List<short[]> DistanciasK1 = new List<short[]>();
         List<short[]> DistanciasK2 = new List<short[]>();
         //:::::::::::::fin variables:::::::::
@@ -237,10 +239,12 @@ namespace KinectSetup
                 if (num == 0)
                 {
                     videoColor1.Add(myImagen);
+                    listaBytes1.Add(myImagen.Bytes);
                 }
                 else
                 {
                     videoColor2.Add(myImagen);
+                    listaBytes2.Add(myImagen.Bytes);
                 }
             }
         } //fin GuardaImagenes() 
@@ -274,6 +278,7 @@ namespace KinectSetup
             {
                 Record(n);
                 RecordDistancia(n);
+                RecordBytesImagen(n);
             }
             grabacion = false;
         }
@@ -308,6 +313,49 @@ namespace KinectSetup
                 videoColor2.Clear();
             }
         } //fin Record() 
+
+
+        private void RecordBytesImagen(int num)
+        {
+            nameVideo = String.Format("{0}{1}{2}", directorio, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+
+            if (num == 0)
+            {
+                using (FileStream file = new FileStream(nameVideo, FileMode.Create, FileAccess.Write))
+                {
+                    using (BinaryWriter bw = new BinaryWriter(file))
+                    {
+                        foreach (byte[] arregloImagen in listaBytes1)
+                        {
+                            bw.Write(arregloImagen);
+                            bw.Write("\n");
+                        }
+                    }
+                }
+
+                nameVideo = null;
+                listaBytes1.Clear(); 
+
+            }
+            else
+            {
+                using (FileStream file = new FileStream(nameVideo, FileMode.Create, FileAccess.Write))
+                {
+                    using (BinaryWriter bw = new BinaryWriter(file))
+                    {
+                        foreach (byte[] arregloImagen2 in listaBytes2)
+                        {
+                            bw.Write(arregloImagen2);
+                            bw.Write("\n");
+                        }
+                    }
+                }
+
+                nameVideo = null; 
+                listaBytes2.Clear();
+
+            }
+        }
 
 
         private void RecordDistancia(int num)
