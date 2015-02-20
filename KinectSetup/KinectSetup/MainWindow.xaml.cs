@@ -43,12 +43,14 @@ namespace KinectSetup
         private short[] DepthValores;
         private System.Drawing.Bitmap BitmapColor;
         bool grabacion = false;
-        string directorio = @"C:\Users\America\Documents\VideosKinect\";
+        string directorio1 = @"C:\Users\America\Documents\DatosKinect\Video";
+        string directorio2 = @"C:\Users\America\Documents\DatosKinect\Bytes";
+        string directorio3 = @"C:\Users\America\Documents\DatosKinect\Depth";
         string nameVideo;
         Image<Bgr, Byte> myImagen;
         List<Image<Bgr, Byte>> videoColor1 = new List<Image<Bgr, Byte>>();
         List<Image<Bgr, Byte>> videoColor2 = new List<Image<Bgr, Byte>>();
-        List<byte[]> listaBytes1 = new List<byte[]>();
+        List<byte[] > listaBytes1 = new List<byte[]>();
         List<byte[]> listaBytes2 = new List<byte[]>(); 
         List<short[]> DistanciasK1 = new List<short[]>();
         List<short[]> DistanciasK2 = new List<short[]>();
@@ -58,7 +60,8 @@ namespace KinectSetup
         //::::::::::::::Constructor:::::::::::::::
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); 
+
             EncuentraKinects();
             InicilizaKinect();
             CompositionTarget.Rendering += new EventHandler(CompositionTarget_Rendering);
@@ -233,6 +236,7 @@ namespace KinectSetup
             if (Sensor.Count == 1)
             {
                 videoColor1.Add(myImagen);
+                listaBytes1.Add(myImagen.Bytes); 
             }
             else
             {
@@ -270,10 +274,12 @@ namespace KinectSetup
         private void Grabar_Click(object sender, RoutedEventArgs e)
         {
             grabacion = true;
+            StopGrabacion.IsEnabled = true; 
         }
 
         private void StopGrabacion_Click(object sender, RoutedEventArgs e)
         {
+            //Grabar.IsEnabled = false;
             for (int n = 0; n < Sensor.Count; n++)
             {
                 Record(n);
@@ -281,12 +287,13 @@ namespace KinectSetup
                 RecordBytesImagen(n);
             }
             grabacion = false;
+            //Grabar.IsEnabled = true; 
         }
 
 
         private void Record(int num)
         {
-            nameVideo = String.Format("{0}{1}{2}", directorio, DateTime.Now.ToString("MMddyyyyHmmss"), ".avi");
+            nameVideo = String.Format("{0}{1}{2}", directorio1, DateTime.Now.ToString("MMddyyyyHmmss"), ".avi");
 
             if (num == 0)
             {
@@ -317,7 +324,7 @@ namespace KinectSetup
 
         private void RecordBytesImagen(int num)
         {
-            nameVideo = String.Format("{0}{1}{2}", directorio, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+            nameVideo = String.Format("{0}{1}{2}", directorio2, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
 
             if (num == 0)
             {
@@ -325,10 +332,17 @@ namespace KinectSetup
                 {
                     using (BinaryWriter bw = new BinaryWriter(file))
                     {
+                        int pos = 0; 
                         foreach (byte[] arregloImagen in listaBytes1)
                         {
-                            bw.Write(arregloImagen);
-                            bw.Write("\n");
+                            bw.Write(arregloImagen, pos, arregloImagen.Length);
+                            long a = bw.BaseStream.Position;
+                            long b = bw.BaseStream.Length;
+                            long d = file.Position;
+                            long c = file.Length;
+                            
+
+                            //pos = pos + arregloImagen.Length -1 ; 
                         }
                     }
                 }
@@ -343,10 +357,12 @@ namespace KinectSetup
                 {
                     using (BinaryWriter bw = new BinaryWriter(file))
                     {
+                        int pos = 0; 
                         foreach (byte[] arregloImagen2 in listaBytes2)
                         {
-                            bw.Write(arregloImagen2);
-                            bw.Write("\n");
+                            bw.Write(arregloImagen2, pos, arregloImagen2.Length);
+                            
+                            //pos = pos + arregloImagen2.Length -1 ;
                         }
                     }
                 }
@@ -355,12 +371,12 @@ namespace KinectSetup
                 listaBytes2.Clear();
 
             }
-        }
+        } //fin record Bytes Imagen
 
 
         private void RecordDistancia(int num)
         {
-            nameVideo = String.Format("{0}{1}{2}", directorio, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+            nameVideo = String.Format("{0}{1}{2}", directorio3, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
 
             if (num == 0)
             {

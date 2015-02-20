@@ -24,3 +24,27 @@ C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\obj\x86\Debu
 C:\Users\America\Documents\Programas en git\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.csprojResolveAssemblyReference.cache
 C:\Users\AmericaIvone\Documents\ProgramaKinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.exe
 C:\Users\AmericaIvone\Documents\ProgramaKinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.pdb
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.exe
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.pdb
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\opencv_core2410.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\opencv_highgui2410.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\opencv_imgproc2410.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\KinectSetup.exe
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\KinectSetup.pdb
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.CV.DebuggerVisualizers.VS2010.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.CV.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.CV.UI.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.Util.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\ZedGraph.dll
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.CV.xml
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.CV.UI.xml
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\bin\Debug\Emgu.Util.xml
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.csprojResolveAssemblyReference.cache
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\MainWindow.baml
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\MainWindow.g.cs
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\App.g.cs
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup_Content.g.cs
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup_MarkupCompile.cache
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.g.resources
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.Properties.Resources.resources
+C:\Users\America\Documents\Setup2Kinect\KinectSetup\KinectSetup\obj\x86\Debug\KinectSetup.csproj.GenerateResource.Cache

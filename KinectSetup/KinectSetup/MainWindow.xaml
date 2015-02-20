@@ -8,6 +8,6 @@
         <Image Height="172" HorizontalAlignment="Right" Margin="0,213,225,0" Name="Imagen2Depth" Stretch="Fill" VerticalAlignment="Top" Width="239" />
         <Image Height="172" HorizontalAlignment="Left" Margin="20,0,0,28" Name="Imagen2Color" Stretch="Fill" VerticalAlignment="Bottom" Width="239" />
         <Button Content="Grabar" Height="42" HorizontalAlignment="Left" Margin="589,100,0,0" Name="Grabar" VerticalAlignment="Top" Width="135" Click="Grabar_Click" />
-        <Button Content="Detener Grabacion " Height="42" HorizontalAlignment="Left" Margin="589,273,0,0" Name="StopGrabacion" VerticalAlignment="Top" Width="135" Click="StopGrabacion_Click" />
+        <Button Content="Detener Grabacion " Height="42" HorizontalAlignment="Left" Margin="589,273,0,0" Name="StopGrabacion" VerticalAlignment="Top" Width="135" Click="StopGrabacion_Click" IsEnabled="False" />
     </Grid>
 </Window>

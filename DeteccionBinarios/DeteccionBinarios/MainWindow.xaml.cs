@@ -22,11 +22,15 @@ namespace DeteccionBinarios
     public partial class MainWindow : Window
     {
         //::::::::::::::Variables:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        private string archivoColor = @"C:\02162015184144.file"; // Lunes 6:42
-        private string archivoDepth = @"C:\01302015114424.file";
+        private string archivoColor1 = @"C:\Users\America\Documents\DatosKinect\Bytes02192015165609.file";
+        private string archivoDepth1 = @"C:\Users\America\Documents\DatosKinect\Depth02192015162443.file"; 
+        private string archivoColor2 = @"C:\Users\America\Documents\DatosKinect\Bytes02192015165609.file";
+        private string archivoDepth2 = @"C:\Users\America\Documents\DatosKinect\Depth02192015162443.file"; 
 
         List<List<short>> DistanciaK1 = new List<List<short>>();
-        List<byte[]> FramesK1= new List<byte[]>(); 
+        List<List<short>> DistanciaK2 = new List<List<short>>();
+        List<byte[]> FramesK1= new List<byte[]>();
+        List<byte[]> FramesK2 = new List<byte[]>(); 
         //:::::::::::::fin variables::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -34,8 +38,10 @@ namespace DeteccionBinarios
         public MainWindow()
         {
             InitializeComponent();
-            DistanciaK1 = LeerDepth(archivoDepth);
-            FramesK1 = GetFrames(archivoColor);
+            DistanciaK1 = LeerDepth(archivoDepth1);
+            DistanciaK2 = LeerDepth(archivoDepth2); 
+            FramesK1 = GetFrames(archivoColor1);
+            FramesK2 = GetFrames(archivoColor2);
         } //Termina constructor 
 
 
@@ -86,7 +92,9 @@ namespace DeteccionBinarios
 
         private List<byte[]> GetFrames(string archivo)
         {
-            byte[] valor; 
+            int lengthValor = 3 * 640 * 480;
+            byte[] valor= new byte[lengthValor];
+            
             List<byte[]> bytesImagenes = new List<byte[]>(); 
 
             using(FileStream file = new FileStream(archivo,FileMode.Open,FileAccess.Read))
@@ -95,7 +103,7 @@ namespace DeteccionBinarios
                 {
                     while(br.BaseStream.Position != br.BaseStream.Length)
                     {
-                        valor = br.ReadBytes(3*640);
+                        valor = br.ReadBytes(lengthValor);
                         bytesImagenes.Add(valor); 
                     }
                 }
