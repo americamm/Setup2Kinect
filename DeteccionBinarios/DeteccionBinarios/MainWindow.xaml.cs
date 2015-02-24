@@ -13,6 +13,10 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.IO; 
+using Emgu.CV; 
+using Emgu.Util; 
+using Emgu.CV.Structure; 
+using System.Runtime.InteropServices; 
 
 namespace DeteccionBinarios
 {
@@ -22,15 +26,15 @@ namespace DeteccionBinarios
     public partial class MainWindow : Window
     {
         //::::::::::::::Variables:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-        private string archivoColor1 = @"C:\Users\America\Documents\DatosKinect\Bytes02192015165609.file";
-        private string archivoDepth1 = @"C:\Users\America\Documents\DatosKinect\Depth02192015162443.file"; 
-        private string archivoColor2 = @"C:\Users\America\Documents\DatosKinect\Bytes02192015165609.file";
-        private string archivoDepth2 = @"C:\Users\America\Documents\DatosKinect\Depth02192015162443.file"; 
+        private string archivoColor1 = @"C:\DatosKinect\K1Bytes02232015191607.file";
+        private string archivoDepth1 = @"C:\DatosKinect\K1Depth02232015191605.file";
+        private string archivoColor2 = @"C:\DatosKinect\K2Bytes02232015191611.file";
+        private string archivoDepth2 = @"C:\DatosKinect\K2Depth02232015191610.file"; 
 
         List<List<short>> DistanciaK1 = new List<List<short>>();
         List<List<short>> DistanciaK2 = new List<List<short>>();
-        List<byte[]> FramesK1= new List<byte[]>();
-        List<byte[]> FramesK2 = new List<byte[]>(); 
+        List<Image<Bgr,Byte>> FramesK1= new List<Image<Bgr,Byte>>(); 
+        List<Image<Bgr, Byte>> FramesK2 = new List<Image<Bgr, Byte>>(); 
         //:::::::::::::fin variables::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
@@ -45,7 +49,7 @@ namespace DeteccionBinarios
         } //Termina constructor 
 
 
-        //:::::::::::::Leer y guardar los adtos de los archivos::::::::::::::::::::::::::::::::::::::: 
+        //:::::::::::::Leer y guardar los datos de los archivos::::::::::::::::::::::::::::::::::::::: 
 
 
         private List<List<short>> LeerDepth(string archivo)
@@ -90,12 +94,13 @@ namespace DeteccionBinarios
         } //Termina LeerDepth 
 
 
-        private List<byte[]> GetFrames(string archivo)
+        private List<Image<Bgr,Byte>> GetFrames(string archivo)
         {
             int lengthValor = 3 * 640 * 480;
             byte[] valor= new byte[lengthValor];
+            List<Image<Bgr, Byte>> imagenBack = new List<Image<Bgr, Byte>>();
             
-            List<byte[]> bytesImagenes = new List<byte[]>(); 
+            //List<byte[]> bytesImagenes = new List<byte[]>(); 
 
             using(FileStream file = new FileStream(archivo,FileMode.Open,FileAccess.Read))
             {
@@ -104,11 +109,21 @@ namespace DeteccionBinarios
                     while(br.BaseStream.Position != br.BaseStream.Length)
                     {
                         valor = br.ReadBytes(lengthValor);
-                        bytesImagenes.Add(valor); 
+
+                        IntPtr unmanagedPointer = Marshal.AllocHGlobal(valor.Length);
+                        Marshal.Copy(valor, 0, unmanagedPointer, valor.Length);
+                        imagenBack.Add(new Image<Bgr, Byte>(640, 480, 1920, unmanagedPointer).Copy()) ;
+
+                        unmanagedPointer = IntPtr.Zero; 
+                        Marshal.FreeHGlobal(unmanagedPointer);
                     }
                 }
-            }
-            return bytesImagenes;
+            }  
+            
+            return imagenBack;
         } //termina GetFrames() 
-    }
-}
+
+
+
+    }// termina clase
+}// termina namespace
