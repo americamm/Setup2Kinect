@@ -11,12 +11,13 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Microsoft.Kinect;
+using Microsoft.Kinect; 
 using System.Drawing;
 using System.IO;
 using Emgu.CV;
 using Emgu.Util;
 using Emgu.CV.Structure; 
+using System.Runtime.InteropServices; 
 
 
 
@@ -43,9 +44,12 @@ namespace KinectSetup
         private short[] DepthValores;
         private System.Drawing.Bitmap BitmapColor;
         bool grabacion = false;
-        string directorio1 = @"C:\Users\America\Documents\DatosKinect\Video";
-        string directorio2 = @"C:\Users\America\Documents\DatosKinect\Bytes";
-        string directorio3 = @"C:\Users\America\Documents\DatosKinect\Depth";
+        string directorioK1V = @"C:\DatosKinect\K1Video";
+        string directorioK1B = @"C:\DatosKinect\K1Bytes";
+        string directorioK1D = @"C:\DatosKinect\K1Depth";
+        string directorioK2V = @"C:\DatosKinect\K2Video";
+        string directorioK2B = @"C:\DatosKinect\K2Bytes";
+        string directorioK2D = @"C:\DatosKinect\K2Depth";
         string nameVideo;
         Image<Bgr, Byte> myImagen;
         List<Image<Bgr, Byte>> videoColor1 = new List<Image<Bgr, Byte>>();
@@ -285,18 +289,19 @@ namespace KinectSetup
                 Record(n);
                 RecordDistancia(n);
                 RecordBytesImagen(n);
+                
             }
             grabacion = false;
             //Grabar.IsEnabled = true; 
         }
 
 
-        private void Record(int num)
+        private void Record(int num)  
         {
-            nameVideo = String.Format("{0}{1}{2}", directorio1, DateTime.Now.ToString("MMddyyyyHmmss"), ".avi");
-
             if (num == 0)
             {
+                nameVideo = String.Format("{0}{1}{2}", directorioK1V, DateTime.Now.ToString("MMddyyyyHmmss"), ".avi");
+
                 using (VideoWriter vi = new VideoWriter(nameVideo, 0, 30, 640, 480, true))
                 {
                     for (int i = 0; i < videoColor1.Count(); i++)
@@ -309,6 +314,8 @@ namespace KinectSetup
             }
             else
             {
+                nameVideo = String.Format("{0}{1}{2}", directorioK2V, DateTime.Now.ToString("MMddyyyyHmmss"), ".avi");
+
                 using (VideoWriter vi = new VideoWriter(nameVideo, 0, 30, 640, 480, true))
                 {
                     for (int i = 0; i < videoColor2.Count(); i++)
@@ -324,10 +331,10 @@ namespace KinectSetup
 
         private void RecordBytesImagen(int num)
         {
-            nameVideo = String.Format("{0}{1}{2}", directorio2, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
-
             if (num == 0)
             {
+                nameVideo = String.Format("{0}{1}{2}", directorioK1B, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+
                 using (FileStream file = new FileStream(nameVideo, FileMode.Create, FileAccess.Write))
                 {
                     using (BinaryWriter bw = new BinaryWriter(file))
@@ -346,13 +353,11 @@ namespace KinectSetup
                         }
                     }
                 }
-
-                nameVideo = null;
-                listaBytes1.Clear(); 
-
             }
             else
             {
+                nameVideo = String.Format("{0}{1}{2}", directorioK2B, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+
                 using (FileStream file = new FileStream(nameVideo, FileMode.Create, FileAccess.Write))
                 {
                     using (BinaryWriter bw = new BinaryWriter(file))
@@ -366,20 +371,20 @@ namespace KinectSetup
                         }
                     }
                 }
-
+                
                 nameVideo = null; 
                 listaBytes2.Clear();
 
             }
-        } //fin record Bytes Imagen
+        }
 
 
         private void RecordDistancia(int num)
         {
-            nameVideo = String.Format("{0}{1}{2}", directorio3, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
-
             if (num == 0)
             {
+                nameVideo = String.Format("{0}{1}{2}", directorioK1D, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+
                 using (FileStream file = new FileStream(nameVideo, FileMode.Create, FileAccess.Write))
                 {
                     using (BinaryWriter bw = new BinaryWriter(file))
@@ -399,6 +404,8 @@ namespace KinectSetup
             }
             else
             {
+                nameVideo = String.Format("{0}{1}{2}", directorioK2D, DateTime.Now.ToString("MMddyyyyHmmss"), ".file");
+
                 using (FileStream file = new FileStream(nameVideo, FileMode.Create, FileAccess.Write))
                 {
                     using (BinaryWriter bw = new BinaryWriter(file))
@@ -416,12 +423,49 @@ namespace KinectSetup
                 nameVideo = string.Empty;
                 DistanciasK2.Clear();
             }
-        }
-
-       //fin RecordDistancias() 
+        }//fin RecordDistancias()   
 
 
+        //::::::::::::Prueba para crear una imagen usando el arreglo de bytes con Imagen<> 
+/*        private void BytestoImagen()
+        {
+            byte[] bytes = listaBytes1[0];
+            int width = 640;
+            int height = 480;
 
 
+            IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytes.Length);
+            Marshal.Copy(bytes, 0, unmanagedPointer, bytes.Length);
+            // Call unmanaged code
+            Marshal.FreeHGlobal(unmanagedPointer);
+
+
+            /*Image<Bgr, Byte> img = new Image<Bgr, Byte>(width,height);
+            
+            GCHandle handle = GCHandle.Alloc(bytes, GCHandle. .Pinned);
+            IntPtr imageHeaderForBytes = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MIplImage)));
+            CvInvoke.cvInitImageHeader(imageHeaderForBytes, new MCvSize(width, height),(int) img.CvDepth,
+       3,
+       0,
+       0); // align
+    Marshal.WriteIntPtr(
+       imageHeaderForBytes, 
+       (int)Marshal.OffsetOf(typeof(MIplImage), "imageDataOrigin"),
+       handle.AddressOfPinnedObject());
+    CvInvoke.CvCopy(imageHeaderForBytes, img, IntPtr.Zero);
+
+    Marshal.FreeHGlobal(imageHeaderForBytes);
+    handle.Free();*/ 
+
+        /*Interop.GCHandle handle = Interop.GCHandle.Alloc(raw, Interop.GCHandleType.Pinned);
+        IntPtr imageHeaderForBytes = Interop.Marshal.AllocHGlobal(Interop.Marshal.SizeOf(typeof(MIplImage)));
+        CvInvoke.cvInitImageHeader(imageHeaderForBytes, new MCvSize(frameGrabber.FrameWidth,frameGrabber.FrameHeight),(int)Image<Bgr, Byte>.CvDepth, 3, 0, 4);
+        Interop.Marshal.WriteIntPtr(imageHeaderForBytes,(int)Interop.Marshal.OffsetOf(typeof(MIplImage), "imageData"),handle.AddrOfPinnedObject());
+        CvInvoke.cvCopy(imageHeaderForBytes, img, IntPtr.Zero);
+        Interop.Marshal.FreeHGlobal(imageHeaderForBytes);
+        handle.Free();
+        } */
+        
+        
     } //fin class
 } //fin de namespace 
