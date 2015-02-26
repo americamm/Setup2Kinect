@@ -423,49 +423,48 @@ namespace KinectSetup
                 nameVideo = string.Empty;
                 DistanciasK2.Clear();
             }
-        }//fin RecordDistancias()   
+        }//fin RecordDistancias()
 
 
-        //::::::::::::Prueba para crear una imagen usando el arreglo de bytes con Imagen<> 
-/*        private void BytestoImagen()
+
+        //::::::::::::Manipula el angulo de ambos sensores:::::::::::::::::::::::::::::::::::::::::::::::::::
+        private bool moverKinect1 = false;
+        private bool moverKinect2 = false; 
+
+        private void radioButton1_Checked(object sender, RoutedEventArgs e)
         {
-            byte[] bytes = listaBytes1[0];
-            int width = 640;
-            int height = 480;
+            moverKinect1 = true; 
+            moverKinect2 = false;
+    
+            anguloSlider.Value = (double) Sensor[0].ElevationAngle;
+            anguloSlider.IsEnabled = true;
+        } 
 
 
-            IntPtr unmanagedPointer = Marshal.AllocHGlobal(bytes.Length);
-            Marshal.Copy(bytes, 0, unmanagedPointer, bytes.Length);
-            // Call unmanaged code
-            Marshal.FreeHGlobal(unmanagedPointer);
-
-
-            /*Image<Bgr, Byte> img = new Image<Bgr, Byte>(width,height);
+        private void radioButton2_Checked(object sender, RoutedEventArgs e)
+        {     
+            moverKinect2 = true; 
+            moverKinect1 = false;
             
-            GCHandle handle = GCHandle.Alloc(bytes, GCHandle. .Pinned);
-            IntPtr imageHeaderForBytes = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(MIplImage)));
-            CvInvoke.cvInitImageHeader(imageHeaderForBytes, new MCvSize(width, height),(int) img.CvDepth,
-       3,
-       0,
-       0); // align
-    Marshal.WriteIntPtr(
-       imageHeaderForBytes, 
-       (int)Marshal.OffsetOf(typeof(MIplImage), "imageDataOrigin"),
-       handle.AddressOfPinnedObject());
-    CvInvoke.CvCopy(imageHeaderForBytes, img, IntPtr.Zero);
+            anguloSlider.Value = (double)Sensor[1].ElevationAngle;
+            anguloSlider.IsEnabled = true;
+        }
 
-    Marshal.FreeHGlobal(imageHeaderForBytes);
-    handle.Free();*/ 
 
-        /*Interop.GCHandle handle = Interop.GCHandle.Alloc(raw, Interop.GCHandleType.Pinned);
-        IntPtr imageHeaderForBytes = Interop.Marshal.AllocHGlobal(Interop.Marshal.SizeOf(typeof(MIplImage)));
-        CvInvoke.cvInitImageHeader(imageHeaderForBytes, new MCvSize(frameGrabber.FrameWidth,frameGrabber.FrameHeight),(int)Image<Bgr, Byte>.CvDepth, 3, 0, 4);
-        Interop.Marshal.WriteIntPtr(imageHeaderForBytes,(int)Interop.Marshal.OffsetOf(typeof(MIplImage), "imageData"),handle.AddrOfPinnedObject());
-        CvInvoke.cvCopy(imageHeaderForBytes, img, IntPtr.Zero);
-        Interop.Marshal.FreeHGlobal(imageHeaderForBytes);
-        handle.Free();
-        } */
-        
+        private void anguloSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (moverKinect1)
+                Sensor[0].ElevationAngle = (int)anguloSlider.Value;
+    
+            if (moverKinect2)
+                Sensor[1].ElevationAngle = (int)anguloSlider.Value;  
+        }
+
+        private void Window_Unloaded(object sender, RoutedEventArgs e)
+        {
+            Sensor[0].Stop();
+            Sensor[1].Stop(); 
+        }
         
     } //fin class
 } //fin de namespace 
