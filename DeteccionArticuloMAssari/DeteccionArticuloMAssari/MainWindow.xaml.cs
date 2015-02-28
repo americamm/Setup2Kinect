@@ -58,6 +58,7 @@ namespace DeteccionArticuloMAssari
            FramesK1 = GetFrames(archivoColor1);
            FramesK2 = GetFrames(archivoColor2);
            SkinColorSegmentation(FramesK2);
+           restaImagenesBgr(FramesK2);
         }
 
         //:::::::::::::Leer y guardar los datos de los archivos::::::::::::::::::::::::::::::::::::::: 
@@ -197,9 +198,23 @@ namespace DeteccionArticuloMAssari
 
 
         private void restaImagenesBgr(List<Image<Bgr,Byte>> framesBgr)
+        {
+            List<Image<Bgr, Byte>> diferenciaFrames = new List<Image<Bgr, Byte>>(framesBgr.Count);
+            List<Image<Gray, Byte>> GrayDiFrames = new List<Image<Gray, Byte>>(framesBgr.Count); 
+
+            for (int i = 0; i < framesBgr.Count; i++ )
+            {
+                diferenciaFrames.Add(framesBgr[i].AbsDiff(framesBgr[i + 1]));
+                GrayDiFrames.Add(diferenciaFrames[i].Convert<Gray, Byte>()); 
+            }
+        }// restaImagenesBgr
+
+
+        private void MovingObjectSegmentation()
         { 
-            
-        }
+        
+
+        }//MovingObjectSegmentation
 
        
 
