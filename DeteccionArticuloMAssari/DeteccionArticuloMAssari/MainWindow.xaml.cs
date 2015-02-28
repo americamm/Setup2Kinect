@@ -40,16 +40,28 @@ namespace DeteccionArticuloMAssari
         private int columnas = 640;
         //:::::::::::::fin variables::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+
+        //:::::::::::::Constructor:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         public MainWindow()
         {
             InitializeComponent();
-            DistanciaK1 = LeerDepth(archivoDepth1);
-            DistanciaK2 = LeerDepth(archivoDepth2);
-            FramesK1 = GetFrames(archivoColor1);
-            FramesK2 = GetFrames(archivoColor2);
+         
+        }
+        //:::::::::::::Fin del constructor:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        
+
+        //:::::::::::::Evento que manda a llamar a mis demas funcioncitas:::::::::::::::::::::::::::::
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+           DistanciaK1 = LeerDepth(archivoDepth1);
+           DistanciaK2 = LeerDepth(archivoDepth2);
+           FramesK1 = GetFrames(archivoColor1);
+           FramesK2 = GetFrames(archivoColor2);
+           SkinColorSegmentation(FramesK2);
         }
 
         //:::::::::::::Leer y guardar los datos de los archivos::::::::::::::::::::::::::::::::::::::: 
+         
 
 
         private List<List<short>> LeerDepth(string archivo)
@@ -137,14 +149,15 @@ namespace DeteccionArticuloMAssari
             }
 
             return bytesFramesYCbCr;
-        }// termina Convert YCbCr
+        }// termina getBytesYCbCr
 
 
         private void SkinColorSegmentation(List<Image<Bgr, Byte>> framesBgr)
         {
             List<Image<Gray, Byte>> framesBinarios = new List<Image<Gray, Byte>>(framesBgr.Count);
             List<byte[, ,]> bytesFramesYCC = new List<byte[, ,]>(framesBgr.Count);
-            Image<Gray, Byte> frameBi = new Image<Gray, Byte>(filas, columnas); ;
+            Image<Gray, Byte> frameBi = new Image<Gray, Byte>(filas, columnas);
+            byte[, ,] bytesGrayImagen = new byte[filas, columnas, 1];  
             double mediaCr = 149.7692;
             double mediaCb = 114.3846;
             double deCr = 13.80914;
@@ -166,19 +179,30 @@ namespace DeteccionArticuloMAssari
                     {
                         if ((izqCr < arregloBytes[i, j, 1]) && (arregloBytes[i, j, 1] < derCr) && (izqCb < arregloBytes[i, j, 2]) && (arregloBytes[i, j, 2] < derCb))
                         {
-                            frameBi.Data[i, j, 0] = 255;
+                            bytesGrayImagen[i, j, 0] = 255; 
+                            //frameBi.Data[i, j, 0] = 255;
                         }
                         else
                         {
-                            frameBi.Data[i, j, 0] = 0;
+                            bytesGrayImagen[i,j,0]=0; 
+                            //frameBi.Data[i, j, 0] = 0;
                         }
                     }
                 }
-
+                frameBi.Data = bytesGrayImagen; 
                 framesBinarios.Add(frameBi);
             }
 
-        }// termina getBytesYCbCr 
+        }//termina skincolorsegmentation
+
+
+        private void restaImagenesBgr(List<Image<Bgr,Byte>> framesBgr)
+        { 
+            
+        }
+
+       
+
 
     }//termina class
 }//termina namespace
