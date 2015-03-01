@@ -57,8 +57,9 @@ namespace DeteccionArticuloMAssari
            DistanciaK2 = LeerDepth(archivoDepth2);
            FramesK1 = GetFrames(archivoColor1);
            FramesK2 = GetFrames(archivoColor2);
-           SkinColorSegmentation(FramesK2);
-           restaImagenesBgr(FramesK2);
+           SkinColorSegmentation(FramesK2);//.GetRange(0,11)
+           MovingObjectSegmentation(FramesK2);//.GetRange(0,11)
+           //restaImagenesBgr(FramesK2);
         }
 
         //:::::::::::::Leer y guardar los datos de los archivos::::::::::::::::::::::::::::::::::::::: 
@@ -138,6 +139,22 @@ namespace DeteccionArticuloMAssari
 
         //:::::::Aqui empieza la parte del programa que hace la deteccion:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
         //basados en el articulo Hand gesture tracking Using Adaptative Kalman Filter:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        
+
+        //Los primeros metodos son para obtener los bytes del cada frame, ya que es mas rapido manejarlo asi que con las propiedades de las imagenes.
+
+
+        private List<byte[, ,]> getBytesBgr(List<Image<Bgr, Byte>> framesBgr)
+        { 
+            List<byte[,,]> bytesFramesBgr = new List<byte[,,]>(framesBgr.Count);
+
+            foreach (Image<Bgr, Byte> frame in framesBgr)
+            {
+                bytesFramesBgr.Add(frame.Data); 
+            }
+
+            return bytesFramesBgr; 
+        }// end getBytesBgr; 
 
 
         private List<byte[, ,]> getBytesYCbCr(List<Image<Bgr, Byte>> framesBgr)
@@ -150,7 +167,10 @@ namespace DeteccionArticuloMAssari
             }
 
             return bytesFramesYCbCr;
-        }// termina getBytesYCbCr
+        }// termina getBytesYCbCr  
+
+
+        //Los metodos para hacer la deteccion de la mano. 
 
 
         private void SkinColorSegmentation(List<Image<Bgr, Byte>> framesBgr)
@@ -181,12 +201,10 @@ namespace DeteccionArticuloMAssari
                         if ((izqCr < arregloBytes[i, j, 1]) && (arregloBytes[i, j, 1] < derCr) && (izqCb < arregloBytes[i, j, 2]) && (arregloBytes[i, j, 2] < derCb))
                         {
                             bytesGrayImagen[i, j, 0] = 255; 
-                            //frameBi.Data[i, j, 0] = 255;
                         }
                         else
                         {
                             bytesGrayImagen[i,j,0]=0; 
-                            //frameBi.Data[i, j, 0] = 0;
                         }
                     }
                 }
@@ -197,22 +215,33 @@ namespace DeteccionArticuloMAssari
         }//termina skincolorsegmentation
 
 
-        private void restaImagenesBgr(List<Image<Bgr,Byte>> framesBgr)
+        private List<object> restaBgr(List<Image<Bgr,Byte>> bytesDeFrames)
         {
-            List<Image<Bgr, Byte>> diferenciaFrames = new List<Image<Bgr, Byte>>(framesBgr.Count);
-            List<Image<Gray, Byte>> GrayDiFrames = new List<Image<Gray, Byte>>(framesBgr.Count); 
+            List<object> grayData = new List<object>(2);
+            List<Image<Gray, Byte>> grayDiferencia = new List<Image<Gray, Byte>>(bytesDeFrames.Count);
+            List<double> promediosGray = new List<double>(bytesDeFrames.Count);
 
-            for (int i = 0; i < framesBgr.Count; i++ )
+            for (int i = 0; i < bytesDeFrames.Count-1; i++)
             {
-                diferenciaFrames.Add(framesBgr[i].AbsDiff(framesBgr[i + 1]));
-                GrayDiFrames.Add(diferenciaFrames[i].Convert<Gray, Byte>()); 
+                grayDiferencia.Add((bytesDeFrames[i].AbsDiff(bytesDeFrames[i + 1])).Convert<Gray, Byte>());
+                promediosGray.Add(grayDiferencia[i].GetAverage().Intensity); 
             }
+
+            grayData.Add(grayDiferencia);
+            grayData.Add(promediosGray); 
+
+            return grayData;
         }// restaImagenesBgr
 
 
-        private void MovingObjectSegmentation()
+        private void MovingObjectSegmentation(List<Image<Bgr,Byte>> framesBgr)
         { 
-        
+            List<Image<Gray,Byte>> FramesGray = new List<Image<Gray,byte>>(framesBgr.Count);
+            List<double> mediaGrayFrames = new List<double>(framesBgr.Count); 
+            
+            List<object> datos = restaBgr(framesBgr);
+            FramesGray = (List<Image<Gray, Byte>>)datos[0];
+            mediaGrayFrames = (List<Double>)datos[1];
 
         }//MovingObjectSegmentation
 
