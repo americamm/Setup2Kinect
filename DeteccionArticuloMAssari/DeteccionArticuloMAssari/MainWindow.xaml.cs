@@ -144,16 +144,16 @@ namespace DeteccionArticuloMAssari
         //Los primeros metodos son para obtener los bytes del cada frame, ya que es mas rapido manejarlo asi que con las propiedades de las imagenes.
 
 
-        private List<byte[, ,]> getBytesBgr(List<Image<Bgr, Byte>> framesBgr)
+        private List<byte[, ,]> getBytesGray(List<Image<Gray, Byte>> framesGray)
         { 
-            List<byte[,,]> bytesFramesBgr = new List<byte[,,]>(framesBgr.Count);
+            List<byte[,,]> bytesFramesGray = new List<byte[,,]>(framesGray.Count);
 
-            foreach (Image<Bgr, Byte> frame in framesBgr)
+            foreach (Image<Gray, Byte> frame in framesGray)
             {
-                bytesFramesBgr.Add(frame.Data); 
+                bytesFramesGray.Add(frame.Data); 
             }
 
-            return bytesFramesBgr; 
+            return bytesFramesGray; 
         }// end getBytesBgr; 
 
 
@@ -224,7 +224,7 @@ namespace DeteccionArticuloMAssari
             for (int i = 0; i < bytesDeFrames.Count-1; i++)
             {
                 grayDiferencia.Add((bytesDeFrames[i].AbsDiff(bytesDeFrames[i + 1])).Convert<Gray, Byte>());
-                promediosGray.Add(grayDiferencia[i].GetAverage().Intensity); 
+                promediosGray.Add((grayDiferencia[i].GetAverage().Intensity)*0.05); 
             }
 
             grayData.Add(grayDiferencia);
@@ -234,14 +234,54 @@ namespace DeteccionArticuloMAssari
         }// restaImagenesBgr
 
 
-        private void MovingObjectSegmentation(List<Image<Bgr,Byte>> framesBgr)
+        private void MovingObjectSegmentation(List<Image<Bgr, Byte>> framesBgr)
         { 
-            List<Image<Gray,Byte>> FramesGray = new List<Image<Gray,byte>>(framesBgr.Count);
-            List<double> mediaGrayFrames = new List<double>(framesBgr.Count); 
+            List<Image<Gray,Byte>> FramesGray = new List<Image<Gray,Byte>>(framesBgr.Count);
+            List<double> mediaGrayFrames = new List<double>(framesBgr.Count);
+            List<byte[, ,]> bytesGray = new List<byte[, ,]>(framesBgr.Count);
+            List<Image<Gray,Byte>> framesBinarios = new List<Image<Gray,Byte>>(framesBgr.Count);
+            Image<Gray,Byte> ImagenBi = new Image<Gray,Byte>(filas,columnas); 
+            byte[,,] bytesBinaryFrame = new byte[filas,columnas,1]; 
+
             
             List<object> datos = restaBgr(framesBgr);
             FramesGray = (List<Image<Gray, Byte>>)datos[0];
             mediaGrayFrames = (List<Double>)datos[1];
+            bytesGray = getBytesGray(FramesGray);
+            double[,,] arrayDouble= new double[filas,columnas,1];
+            Array.Clear(bytesBinaryFrame, 0, bytesBinaryFrame.Length); //fill the zeros
+            double a= (double)255; 
+
+            /*for(int n=0; n<arr)
+            for(int i =0; i<480; i++)
+                {
+                    for(int j=0; j<640; j++)
+                    { 
+                       arrayDouble[i,j,0]=bytesGray[n][i,j,0]; 
+                    }
+                } 
+            */
+
+            foreach (byte[, ,] arreglo in bytesGray)
+            {
+                //Double[,,] arregloD = (double[,,])arreglo; 
+
+                for(int i =0; i<480; i++)
+                {
+                    for(int j=0; j<640; j++)
+                    { 
+                        //double a =double((arreglo[i, j, 0] / 255))
+                        if (arreglo[i,j,0]/255 > (mediaGrayFrames[i]))
+                            bytesBinaryFrame[i, j, 0] = 255;
+                        
+                        
+                    }
+                } 
+
+                ImagenBi.Data=bytesBinaryFrame;
+                framesBinarios.Add(ImagenBi); 
+                
+            }
 
         }//MovingObjectSegmentation
 
