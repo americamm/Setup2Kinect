@@ -15,7 +15,8 @@ using Emgu.CV;
 using Emgu.Util;
 using Emgu.CV.Structure;
 using System.IO;
-using System.Runtime.InteropServices; 
+using System.Runtime.InteropServices;
+using System.Drawing; 
 
 
 namespace DeteccionArticuloMAssari
@@ -57,8 +58,7 @@ namespace DeteccionArticuloMAssari
            DistanciaK2 = LeerDepth(archivoDepth2);
            FramesK1 = GetFrames(archivoColor1);
            FramesK2 = GetFrames(archivoColor2);
-           SkinColorSegmentation(FramesK2);//.GetRange(0,11)
-           MovingObjectSegmentation(FramesK2);//.GetRange(0,11)
+           intersectionBinaryFrames(FramesK2); 
         }
 
         //:::::::::::::Leer y guardar los datos de los archivos::::::::::::::::::::::::::::::::::::::: 
@@ -186,7 +186,7 @@ namespace DeteccionArticuloMAssari
         //Los metodos para hacer la deteccion de la mano. 
 
 
-        private void SkinColorSegmentation(List<Image<Bgr, Byte>> framesBgr)
+        private List<Image<Gray,Byte>> SkinColorSegmentation(List<Image<Bgr, Byte>> framesBgr)
         {
             List<Image<Gray, Byte>> framesBinarios = new List<Image<Gray, Byte>>(framesBgr.Count);
             List<byte[, ,]> bytesFramesYCC = new List<byte[, ,]>(framesBgr.Count);
@@ -220,6 +220,7 @@ namespace DeteccionArticuloMAssari
                 framesBinarios.Add(frameBi);
             }
 
+            return framesBinarios; 
         }//termina skincolorsegmentation
 
 
@@ -280,9 +281,66 @@ namespace DeteccionArticuloMAssari
         }//MovingObjectSegmentation 
 
 
-        private void intersectionBinaryFrames()
-        { 
-        
+        private void intersectionBinaryFrames(List<Image<Bgr,Byte>> framesBgr)
+        {
+            List<Image<Gray, Byte>> interseccion = new List<Image<Gray, byte>>(framesBgr.Count - 1);
+            int[] minFilas = new int[framesBgr.Count - 1];
+            int[] maxFilas = new int[framesBgr.Count - 1];
+            int[] minColumnas = new int[framesBgr.Count - 1];
+            int[] maxColumnas = new int[framesBgr.Count - 1];
+            //List<int> posFilas = new List<int>();
+            //List<int> posColumnas = new List<int>();  
+            int indexito=0;
+            System.Drawing.Rectangle Roi; 
+
+            List<Image<Gray, Byte>> frameBinarioSCS = SkinColorSegmentation(framesBgr);
+            List<Image<Gray, Byte>> frameBinarioMOS = MovingObjectSegmentation(framesBgr);
+
+            for (int i = 1; i < framesBgr.Count - 1; i++)
+            {
+                interseccion.Add(frameBinarioSCS[i].And(frameBinarioMOS[i])); 
+            }
+
+            List<byte[,,]> bytesInterseccion = getBytesGray(interseccion);
+
+            foreach (byte[,,] arreglo in bytesInterseccion)
+            {
+                List<int> posFilas = new List<int>();
+                List<int> posColumnas = new List<int>();
+
+                for (int i = 150; i < filas-150; i++)
+                {
+                    for (int j = 50; j < columnas-200; j++)
+                    {
+                        if (arreglo[i, j, 0] == 255)
+                        {
+                            posFilas.Add(i);
+                            posColumnas.Add(j); 
+                        }
+                    }
+                }
+
+                minFilas[indexito] = posFilas.Min();
+                maxFilas[indexito] = posFilas.Max();
+                minColumnas[indexito] = posColumnas.Min();
+                maxColumnas[indexito] = posColumnas.Max();
+
+                indexito++; 
+
+            }
+
+            for (int i = 0; i < framesBgr.Count - 1; i++)
+            {
+                framesBgr[i].ROI = System.Drawing.Rectangle.Empty; 
+                Roi = new System.Drawing.Rectangle(minColumnas[i], minFilas[i], maxColumnas[i] - minColumnas[i], maxFilas[i] - minFilas[i]);
+                Bgr colorcin = new Bgr(System.Drawing.Color.Black); 
+                
+                framesBgr[i].Draw(Roi,colorcin,1); 
+                //framesBgr[i].ROI = Roi;
+            }
+
+
+
         }
 
        
