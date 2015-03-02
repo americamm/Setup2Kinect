@@ -59,7 +59,6 @@ namespace DeteccionArticuloMAssari
            FramesK2 = GetFrames(archivoColor2);
            SkinColorSegmentation(FramesK2);//.GetRange(0,11)
            MovingObjectSegmentation(FramesK2);//.GetRange(0,11)
-           //restaImagenesBgr(FramesK2);
         }
 
         //:::::::::::::Leer y guardar los datos de los archivos::::::::::::::::::::::::::::::::::::::: 
@@ -143,18 +142,32 @@ namespace DeteccionArticuloMAssari
 
         //Los primeros metodos son para obtener los bytes del cada frame, ya que es mas rapido manejarlo asi que con las propiedades de las imagenes.
 
-
+       
         private List<byte[, ,]> getBytesGray(List<Image<Gray, Byte>> framesGray)
         { 
             List<byte[,,]> bytesFramesGray = new List<byte[,,]>(framesGray.Count);
 
             foreach (Image<Gray, Byte> frame in framesGray)
-            {
+            {  
                 bytesFramesGray.Add(frame.Data); 
             }
 
             return bytesFramesGray; 
         }// end getBytesBgr; 
+
+
+        private List<byte[]> getGrayByteArray(List<Image<Gray, Byte>> framesGray)
+        {
+            List<byte[]> bytesFramesGray = new List<byte[]>(framesGray.Count);
+
+            foreach (Image<Gray, Byte> frame in framesGray)
+            {
+                bytesFramesGray.Add(frame.Bytes);
+            }
+
+            return bytesFramesGray;
+        }// end getBytesBgr; 
+
 
 
         private List<byte[, ,]> getBytesYCbCr(List<Image<Bgr, Byte>> framesBgr)
@@ -184,6 +197,7 @@ namespace DeteccionArticuloMAssari
             double deCr = 13.80914;
             double deCb = 7.136041;
 
+
             bytesFramesYCC = getBytesYCbCr(framesBgr);
             double izqCr = mediaCr - deCr;
             double derCr = mediaCr + deCr;
@@ -193,19 +207,13 @@ namespace DeteccionArticuloMAssari
 
             foreach (byte[, ,] arregloBytes in bytesFramesYCC)
             {
-
+                Array.Clear(bytesGrayImagen, 0, bytesGrayImagen.Length); 
                 for (int i = 0; i < filas; i++)
                 {
                     for (int j = 0; j < columnas; j++)
                     {
                         if ((izqCr < arregloBytes[i, j, 1]) && (arregloBytes[i, j, 1] < derCr) && (izqCb < arregloBytes[i, j, 2]) && (arregloBytes[i, j, 2] < derCb))
-                        {
                             bytesGrayImagen[i, j, 0] = 255; 
-                        }
-                        else
-                        {
-                            bytesGrayImagen[i,j,0]=0; 
-                        }
                     }
                 }
                 frameBi.Data = bytesGrayImagen; 
@@ -217,6 +225,7 @@ namespace DeteccionArticuloMAssari
 
         private List<object> restaBgr(List<Image<Bgr,Byte>> bytesDeFrames)
         {
+            //bytesDeFrames.Add(null); //Agrego esto por que si no tarda anios :/ por que? quien sabe?
             List<object> grayData = new List<object>(2);
             List<Image<Gray, Byte>> grayDiferencia = new List<Image<Gray, Byte>>(bytesDeFrames.Count);
             List<double> promediosGray = new List<double>(bytesDeFrames.Count);
@@ -224,7 +233,7 @@ namespace DeteccionArticuloMAssari
             for (int i = 0; i < bytesDeFrames.Count-1; i++)
             {
                 grayDiferencia.Add((bytesDeFrames[i].AbsDiff(bytesDeFrames[i + 1])).Convert<Gray, Byte>());
-                promediosGray.Add((grayDiferencia[i].GetAverage().Intensity)*0.05); 
+                promediosGray.Add((grayDiferencia[i].GetAverage().Intensity)); 
             }
 
             grayData.Add(grayDiferencia);
@@ -234,7 +243,7 @@ namespace DeteccionArticuloMAssari
         }// restaImagenesBgr
 
 
-        private void MovingObjectSegmentation(List<Image<Bgr, Byte>> framesBgr)
+        private List<Image<Gray,Byte>> MovingObjectSegmentation(List<Image<Bgr, Byte>> framesBgr)
         { 
             List<Image<Gray,Byte>> FramesGray = new List<Image<Gray,Byte>>(framesBgr.Count);
             List<double> mediaGrayFrames = new List<double>(framesBgr.Count);
@@ -242,48 +251,39 @@ namespace DeteccionArticuloMAssari
             List<Image<Gray,Byte>> framesBinarios = new List<Image<Gray,Byte>>(framesBgr.Count);
             Image<Gray,Byte> ImagenBi = new Image<Gray,Byte>(filas,columnas); 
             byte[,,] bytesBinaryFrame = new byte[filas,columnas,1]; 
+            int indexito = 0; 
 
-            
             List<object> datos = restaBgr(framesBgr);
             FramesGray = (List<Image<Gray, Byte>>)datos[0];
             mediaGrayFrames = (List<Double>)datos[1];
             bytesGray = getBytesGray(FramesGray);
-            double[,,] arrayDouble= new double[filas,columnas,1];
             Array.Clear(bytesBinaryFrame, 0, bytesBinaryFrame.Length); //fill the zeros
-            double a= (double)255; 
-
-            /*for(int n=0; n<arr)
-            for(int i =0; i<480; i++)
-                {
-                    for(int j=0; j<640; j++)
-                    { 
-                       arrayDouble[i,j,0]=bytesGray[n][i,j,0]; 
-                    }
-                } 
-            */
-
             foreach (byte[, ,] arreglo in bytesGray)
             {
-                //Double[,,] arregloD = (double[,,])arreglo; 
-
-                for(int i =0; i<480; i++)
+                
+              for (int i = 0; i < filas; i++)
                 {
-                    for(int j=0; j<640; j++)
+                    for (int j = 0; j < columnas; j++)
                     { 
-                        //double a =double((arreglo[i, j, 0] / 255))
-                        if (arreglo[i,j,0]/255 > (mediaGrayFrames[i]))
+                       
+                        if ((arreglo[i,j,0]/255.00) > (mediaGrayFrames[indexito]*0.05))
                             bytesBinaryFrame[i, j, 0] = 255;
-                        
-                        
                     }
                 } 
 
-                ImagenBi.Data=bytesBinaryFrame;
-                framesBinarios.Add(ImagenBi); 
-                
+                indexito++; 
+                ImagenBi.Data = bytesBinaryFrame;
+                framesBinarios.Add(ImagenBi);
             }
 
-        }//MovingObjectSegmentation
+            return framesBinarios;
+        }//MovingObjectSegmentation 
+
+
+        private void intersectionBinaryFrames()
+        { 
+        
+        }
 
        
 
